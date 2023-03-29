@@ -1,15 +1,16 @@
 package librae
 
 import imgui.ImGui
+import imgui.type.ImBoolean
 import librae.value.BooleanValue
 import librae.value.Float2Value
 import librae.value.Float3Value
 import librae.value.FloatValue
 
-inline fun begin(label: String, block: () -> Unit) {
-    if (ImGui.begin(label))
+inline fun begin(label: String, open: Boolean = true, flags: Int = 0, block: () -> Unit = { }) {
+    if (ImGui.begin(label, ImBoolean(open)))
         block()
-        ImGui.end()
+    ImGui.end()
 }
 
 inline fun frame(block: () -> Unit) {
@@ -24,7 +25,16 @@ inline fun tooltip(block: () -> Unit) {
     ImGui.endTooltip()
 }
 
-inline fun image(id: Int, width: Float, height: Float, u0: Float = 0f, v0: Float = 0f, u1: Float = 0f, v1: Float = 0f, block: () -> Unit = { }) {
+inline fun image(
+    id: Int,
+    width: Float,
+    height: Float,
+    u0: Float = 0f,
+    v0: Float = 0f,
+    u1: Float = 0f,
+    v1: Float = 0f,
+    block: () -> Unit = { }
+) {
     ImGui.image(id, width, height, u0, v0, u1, v1)
     block()
 }

@@ -4,7 +4,12 @@ import ain.rp.MeshRenderer
 import ain.rp.Renderable
 import ain.window.Window
 import asset.VelaAssetManager
+import imgui.flag.ImGuiCond
+import imgui.flag.ImGuiConfigFlags
+import imgui.flag.ImGuiStyleVar
+import imgui.flag.ImGuiWindowFlags
 import imgui.internal.ImGui
+import imgui.type.ImBoolean
 import librae.*
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11
@@ -21,17 +26,38 @@ class TestRenderable : Renderable() {
     }
 }
 
-class TestUI(val gBuffer: GBuffer) : UIInstance() {
+class TestUI(val gBuffer: GBuffer, val window: Window) : UIInstance() {
+
+    init {
+        ImGui.getIO().configFlags = ImGui.getIO().configFlags or ImGuiConfigFlags.DockingEnable
+    }
+
     override fun render() {
         super.render()
 
-        begin("test") {
-            image(gBuffer.textures[0], 256f, 256f, 0f, 1f, 1f, 0f)
-            ImGui.sameLine()
-            image(gBuffer.textures[1], 256f, 256f, 0f, 1f, 1f, 0f)
-            image(gBuffer.textures[2], 256f, 256f, 0f, 1f, 1f, 0f)
-            ImGui.sameLine()
-            image(gBuffer.textures[3], 256f, 256f, 0f, 1f, 1f, 0f)
+        ImGui.setNextWindowPos(0.0f, 0.0f, ImGuiCond.Always)
+        ImGui.setNextWindowSize(window.width.toFloat(), window.height.toFloat())
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f)
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0.0f)
+
+        begin(
+            "Dockspace",
+            true,
+            ImGuiWindowFlags.MenuBar or ImGuiWindowFlags.NoTitleBar or ImGuiWindowFlags.NoCollapse or ImGuiWindowFlags.NoResize or ImGuiWindowFlags.NoMove or ImGuiWindowFlags.NoBringToFrontOnFocus or ImGuiWindowFlags.NoNavFocus
+        ) {
+            ImGui.popStyleVar(2)
+
+            ImGui.dockSpace(ImGui.getID("Dockspace"))
+
+            begin("GBuffer") {
+                for (i in 0 until GBuffer.TOTAL_TEXTURES) {
+                    image(gBuffer.textures[i], 455f, 256f, 0f, 1f, 1f, 0f)
+                }
+            }
+
+            begin("Main") {
+                image(gBuffer.textures[0], 1600f, 900f, 0f, 1f, 1f, 0f)
+            }
         }
     }
 }
@@ -42,7 +68,7 @@ class Scene(window: Window) : Scene() {
     private val uiRenderer = UIRenderer(window)
 
     private val testRenderable = TestRenderable()
-    private val ui = TestUI(rp.gBuffer)
+    private val ui = TestUI(rp.gBuffer, window)
 
     override fun create() {
         testRenderable.transformationMatrix.setTranslation(0f, 0f, -3f)

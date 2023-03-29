@@ -12,7 +12,7 @@ import vela.scene.Scene
 import vela.scene.SceneManager
 
 class App : VelaApplication() {
-    private val window = Window(800, 600, "Ain engine")
+    private val window = Window(1920, 1080, "Ain engine")
     private val assetLoader = VelaAssetLoader()
     private val sceneManager = SceneManager()
     private val camera = Camera(window.width, window.height)

@@ -55,6 +55,6 @@ class GBuffer(window: Window) : Destroyable {
     }
 
     companion object {
-        private const val TOTAL_TEXTURES = 4
+        const val TOTAL_TEXTURES = 4
     }
 }

@@ -35,7 +35,6 @@ class UIRenderPipeline(window: Window) : RenderPipeline(object : Shader("#sectio
         imGuiGl3.init("#version 130")
 
         val imGuiIO = ImGui.getIO()
-        imGuiIO.iniFilename = null
         imGuiIO.setDisplaySize(window.width.toFloat(), window.height.toFloat())
     }
 
