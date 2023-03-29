@@ -58,6 +58,7 @@ class VelaAssetLoader : AssetLoader(VelaAssetManager) {
         queueAsset("depth", String::class.java)
         queueAsset("gbuffer", String::class.java)
         queueAsset("default", String::class.java)
+        queueAsset("final", String::class.java)
         queueAsset("texture", Texture::class.java)
     }
 }

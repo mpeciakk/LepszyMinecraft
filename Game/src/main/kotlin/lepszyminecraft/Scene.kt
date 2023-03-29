@@ -26,7 +26,7 @@ class TestRenderable : Renderable() {
     }
 }
 
-class TestUI(val gBuffer: GBuffer, val window: Window) : UIInstance() {
+class TestUI(val rp: DeferredRenderingPipeline, val window: Window) : UIInstance() {
 
     init {
         ImGui.getIO().configFlags = ImGui.getIO().configFlags or ImGuiConfigFlags.DockingEnable
@@ -50,13 +50,13 @@ class TestUI(val gBuffer: GBuffer, val window: Window) : UIInstance() {
             ImGui.dockSpace(ImGui.getID("Dockspace"))
 
             begin("GBuffer") {
-                for (i in 0 until GBuffer.TOTAL_TEXTURES) {
-                    image(gBuffer.textures[i], 455f, 256f, 0f, 1f, 1f, 0f)
+                for (i in rp.gBuffer.textures) {
+                    image(i, 455f, 256f, 0f, 1f, 1f, 0f)
                 }
             }
 
             begin("Main") {
-                image(gBuffer.textures[0], 1600f, 900f, 0f, 1f, 1f, 0f)
+                image(rp.finalTexture, 1600f, 900f, 0f, 1f, 1f, 0f)
             }
         }
     }
@@ -68,7 +68,7 @@ class Scene(window: Window) : Scene() {
     private val uiRenderer = UIRenderer(window)
 
     private val testRenderable = TestRenderable()
-    private val ui = TestUI(rp.gBuffer, window)
+    private val ui = TestUI(rp, window)
 
     override fun create() {
         testRenderable.transformationMatrix.setTranslation(0f, 0f, -3f)
