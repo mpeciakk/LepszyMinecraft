@@ -55,7 +55,9 @@ class VelaAssetLoader : AssetLoader(VelaAssetManager) {
 
     override fun load() {
         queueAsset("empty", String::class.java)
-        queueAsset("ui", String::class.java)
+        queueAsset("depth", String::class.java)
+        queueAsset("gbuffer", String::class.java)
         queueAsset("default", String::class.java)
+        queueAsset("texture", Texture::class.java)
     }
 }

@@ -24,8 +24,8 @@ inline fun tooltip(block: () -> Unit) {
     ImGui.endTooltip()
 }
 
-inline fun image(id: Int, width: Float, height: Float, u: Float = 0f, v: Float = 0f, block: () -> Unit = { }) {
-    ImGui.image(id, width, height, u, v)
+inline fun image(id: Int, width: Float, height: Float, u0: Float = 0f, v0: Float = 0f, u1: Float = 0f, v1: Float = 0f, block: () -> Unit = { }) {
+    ImGui.image(id, width, height, u0, v0, u1, v1)
     block()
 }
 

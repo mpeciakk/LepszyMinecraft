@@ -2,14 +2,14 @@ package librae
 
 import ain.input.Input
 import ain.rp.Renderable
+import ain.rp.RenderableState
 import imgui.ImGui
 import org.lwjgl.glfw.GLFW
 
 abstract class UIInstance : Renderable() {
 
     init {
-        setupMesh("default", UIMeshBuilder())
-        markDirty()
+        state = RenderableState.READY
     }
 
     open fun render() {

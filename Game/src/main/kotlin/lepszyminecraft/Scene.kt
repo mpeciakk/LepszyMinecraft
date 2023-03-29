@@ -1,48 +1,19 @@
 package lepszyminecraft
 
-import ain.mesh.Mesh
 import ain.rp.MeshRenderer
-import ain.rp.RenderPipeline
 import ain.rp.Renderable
 import ain.window.Window
 import asset.VelaAssetManager
 import imgui.internal.ImGui
-import librae.UIInstance
-import librae.UIRenderer
-import librae.begin
-import librae.frame
+import librae.*
+import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL15
-import org.lwjgl.opengl.GL20
-import vela.Camera
+import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
+import org.lwjgl.opengl.GL11.glBindTexture
+import vela.asset.Texture
+import vela.render.DeferredRenderingPipeline
+import vela.render.GBuffer
 import vela.scene.Scene
-import vela.shader.DefaultShader
-
-class TestRenderPipeline : RenderPipeline(DefaultShader(VelaAssetManager[String::class.java, "default"])) {
-    override fun render(obj: Renderable, mesh: Mesh) {
-        shader.start()
-
-        shader.loadMatrix("projectionMatrix", Camera.current.projectionMatrix)
-        shader.loadMatrix("transformationMatrix", obj.transformationMatrix)
-        shader.loadMatrix("viewMatrix", Camera.current.viewMatrix)
-
-        mesh.bind()
-        mesh.vbos.values.forEach {
-            GL20.glEnableVertexAttribArray(it.attributeNumber)
-        }
-
-        GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.elementsCount, GL11.GL_UNSIGNED_INT, 0);
-
-        mesh.vbos.values.forEach {
-            GL20.glDisableVertexAttribArray(it.attributeNumber)
-        }
-        mesh.unbind()
-
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0)
-
-        shader.stop()
-    }
-}
 
 class TestRenderable : Renderable() {
     override fun rebuild() {
@@ -50,35 +21,38 @@ class TestRenderable : Renderable() {
     }
 }
 
-class TestUI : UIInstance() {
+class TestUI(val gBuffer: GBuffer) : UIInstance() {
     override fun render() {
         super.render()
 
-        frame {
-            begin("test") {
-
-            }
+        begin("test") {
+            image(gBuffer.textures[0], 256f, 256f, 0f, 1f, 1f, 0f)
+            ImGui.sameLine()
+            image(gBuffer.textures[1], 256f, 256f, 0f, 1f, 1f, 0f)
+            image(gBuffer.textures[2], 256f, 256f, 0f, 1f, 1f, 0f)
+            ImGui.sameLine()
+            image(gBuffer.textures[3], 256f, 256f, 0f, 1f, 1f, 0f)
         }
-
-        ImGui.render()
     }
 }
 
 class Scene(window: Window) : Scene() {
-    private val testRenderer = MeshRenderer<TestRenderable>(TestRenderPipeline())
+    private val rp = DeferredRenderingPipeline(window)
+    private val renderer = MeshRenderer<TestRenderable>(rp)
     private val uiRenderer = UIRenderer(window)
 
     private val testRenderable = TestRenderable()
-    private val ui = TestUI()
+    private val ui = TestUI(rp.gBuffer)
 
     override fun create() {
+        testRenderable.transformationMatrix.setTranslation(0f, 0f, -3f)
         testRenderable.markDirty()
     }
 
     override fun render(deltaTime: Float) {
         GL11.glClearColor(0f, 0f, 0f, 1f)
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT)
-        testRenderer.render(testRenderable)
+        renderer.render(testRenderable)
         uiRenderer.render(ui)
     }
 }
