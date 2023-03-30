@@ -1,4 +1,4 @@
-package vela.render
+package vela.render.deferred
 
 import ain.mesh.Mesh
 import ain.rp.RenderPipeline

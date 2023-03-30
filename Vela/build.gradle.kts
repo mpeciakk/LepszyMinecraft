@@ -12,5 +12,6 @@ dependencies {
     api(project(":Ain"))
     api(project(":Aries"))
     api(project(":Librae"))
+    api("de.javagl:obj:0.4.0")
 }
 

@@ -1,4 +1,4 @@
-package vela.render
+package vela.render.deferred
 
 import ain.util.Destroyable
 import ain.window.Window

@@ -1,5 +1,6 @@
 package lepszyminecraft
 
+import ain.mesh.VertexMeshBuilder
 import ain.rp.MeshRenderer
 import ain.rp.Renderable
 import ain.window.Window
@@ -9,20 +10,22 @@ import imgui.flag.ImGuiConfigFlags
 import imgui.flag.ImGuiStyleVar
 import imgui.flag.ImGuiWindowFlags
 import imgui.internal.ImGui
-import imgui.type.ImBoolean
 import librae.*
-import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
-import org.lwjgl.opengl.GL11.glBindTexture
-import vela.asset.Texture
-import vela.render.DeferredRenderingPipeline
-import vela.render.GBuffer
+import vela.asset.ObjModel
+import vela.render.deferred.DeferredRenderingPipeline
 import vela.scene.Scene
 
 class TestRenderable : Renderable() {
     override fun rebuild() {
         getBuilder().drawCube(0f, 0f, 0f, 1f, 1f, 1f, true, true, true, true, true, true)
+    }
+}
+
+class GameObject(private val model: ObjModel) : Renderable() {
+    override fun rebuild() {
+        (getBuilder() as VertexMeshBuilder).setIndices(model.indices.asList())
+        (getBuilder() as VertexMeshBuilder).setVertices(model.vertices)
     }
 }
 
@@ -64,10 +67,10 @@ class TestUI(val rp: DeferredRenderingPipeline, val window: Window) : UIInstance
 
 class Scene(window: Window) : Scene() {
     private val rp = DeferredRenderingPipeline(window)
-    private val renderer = MeshRenderer<TestRenderable>(rp)
+    private val renderer = MeshRenderer<Renderable>(rp)
     private val uiRenderer = UIRenderer(window)
 
-    private val testRenderable = TestRenderable()
+    private val testRenderable = GameObject(VelaAssetManager[ObjModel::class.java, "model"])
     private val ui = TestUI(rp, window)
 
     override fun create() {

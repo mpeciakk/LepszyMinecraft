@@ -5,6 +5,10 @@ import ain.mesh.Vertex
 import ain.mesh.VertexMeshBuilder
 import aries.AssetLoader
 import asset.VelaAssetManager
+import de.javagl.obj.FloatTuples
+import de.javagl.obj.ObjData
+import de.javagl.obj.ObjReader
+import de.javagl.obj.ObjUtils
 import org.lwjgl.BufferUtils
 import javax.imageio.ImageIO
 
@@ -46,6 +50,30 @@ class VelaAssetLoader : AssetLoader(VelaAssetManager) {
             }
         }
 
+        deserializers[ObjModel::class.java] = object : Deserializer<ObjModel>() {
+            override fun deserialize(name: String): ObjModel {
+                val obj = ObjUtils.convertToRenderable(
+                    ObjReader.read(getFileStream("/models/$name.obj"))
+                )
+
+                val vertices = mutableListOf<Vertex>()
+
+                var ti = 0
+                var vi = 0
+                var ni = 0
+
+                for (i in 0 until obj.numVertices) {
+                    val vertex = obj.getVertex(vi++)
+                    val uv = if (obj.numTexCoords > ti) obj.getTexCoord(ti++) else FloatTuples.create(0f, 0f, 0f)
+                    val normal = if (obj.numNormals > ni) obj.getNormal(ni++) else FloatTuples.create(0f, 0f, 0f)
+
+                    vertices.add(Vertex(vertex.x, vertex.y, vertex.z, uv.x, uv.y, null, normal.x, normal.y, normal.z))
+                }
+
+                return ObjModel(vertices, ObjData.getFaceVertexIndicesArray(obj))
+            }
+        }
+
         deserializers[String::class.java] = object : Deserializer<String>() {
             override fun deserialize(name: String): String {
                 return getTextFile("/shaders/$name.glsl")
@@ -60,5 +88,6 @@ class VelaAssetLoader : AssetLoader(VelaAssetManager) {
         queueAsset("default", String::class.java)
         queueAsset("final", String::class.java)
         queueAsset("texture", Texture::class.java)
+        queueAsset("model", ObjModel::class.java)
     }
 }

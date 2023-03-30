@@ -1,8 +1,7 @@
-package vela.render
+package vela.render.deferred
 
 import org.lwjgl.opengl.GL30.*
 import org.lwjgl.system.MemoryStack
-import org.lwjgl.system.MemoryUtil
 
 class QuadMesh {
     val numVertices = 6
